@@ -1,0 +1,512 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #2d0a0a;
+    color: #fff;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 20px;
+    border-bottom: 3px solid #E60000;
+}
+
+.header-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.control-btn {
+    background-color: rgba(230, 0, 0, 0.8);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.control-btn:hover {
+    background-color: rgba(230, 0, 0, 1);
+    transform: translateY(-1px);
+}
+
+.project-tabs {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px 0;
+    border-bottom: 2px solid rgba(230, 0, 0, 0.3);
+}
+
+.tabs-container {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.tab {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.tab.active {
+    background-color: #E60000;
+    color: white;
+}
+
+.tab:hover:not(.active) {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.add-tab-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.add-tab-btn:hover {
+    background-color: #E60000;
+}
+
+.tab-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.tab-control-btn {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.tab-control-btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+h1 {
+    color: #E60000;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.export-btn {
+    background-color: #E60000;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(230, 0, 0, 0.3);
+}
+
+.export-btn:hover {
+    background-color: #cc0000;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(230, 0, 0, 0.4);
+}
+
+.controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    flex-wrap: wrap;
+}
+
+.input-group {
+    flex: 1;
+    min-width: 150px;
+}
+
+.input-group input,
+.input-group select {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid #555;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.input-group select option {
+    background-color: #2d0a0a;
+    color: #fff;
+    padding: 8px;
+}
+
+.input-group input:focus,
+.input-group select:focus {
+    outline: none;
+    border-color: #E60000;
+}
+
+.add-btn {
+    background-color: #E60000;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-width: 120px;
+}
+
+.add-btn:hover {
+    background-color: #cc0000;
+    transform: translateY(-1px);
+}
+
+.agenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.agenda-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-radius: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    position: relative;
+}
+
+.agenda-item:hover {
+    transform: translateY(-2px);
+}
+
+.agenda-item.alignment {
+    background-color: #6A1B9A;
+    color: white;
+}
+
+.agenda-item.approval {
+    background-color: #1976D2;
+    color: white;
+}
+
+.agenda-item.help {
+    background-color: #FFFFC5;
+    color: #333;
+}
+
+.agenda-item.decision {
+    background-color: #64B5F6;
+    color: white;
+}
+
+.agenda-item.informed {
+    background-color: #388E3C;
+    color: white;
+}
+
+.agenda-item.review {
+    background-color: #D32F2F;
+    color: white;
+}
+
+.agenda-item.escalation {
+    background-color: #FFA500;
+    color: #333;
+}
+
+.item-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.item-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    flex: 1;
+}
+
+.item-status {
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 6px 12px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.item-minutes {
+    font-size: 1.1rem;
+    font-weight: bold;
+    min-width: 80px;
+    text-align: center;
+    padding: 8px 16px;
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+}
+
+/* Icon styles */
+.status-icon, .clock-icon {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+}
+
+.export-agenda-list .status-icon, 
+.export-agenda-list .clock-icon {
+    width: 20px;
+    height: 20px;
+}
+
+/* Inline editing styles */
+.editable {
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.editable:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.delete-btn {
+    background-color: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-left: 15px;
+}
+
+.delete-btn:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Export container styles */
+.export-container {
+    position: absolute;
+    left: -9999px;
+    top: -9999px;
+    width: 1920px;
+    height: 1080px;
+    background: linear-gradient(135deg, #000000 0%, #1a0000 30%, #330000 70%, #E60000 100%);
+    padding: 60px 60px 100px 60px;
+    box-sizing: border-box;
+    position: relative;
+}
+
+.export-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+        radial-gradient(circle at 20% 80%, rgba(230, 0, 0, 0.05) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(230, 0, 0, 0.03) 0%, transparent 50%),
+        radial-gradient(circle at 40% 40%, rgba(230, 0, 0, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+}
+
+.export-container::after {
+    content: '';
+    position: absolute;
+    top: 50px;
+    right: 50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(230, 0, 0, 0.08) 0%, rgba(230, 0, 0, 0.04) 30%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+.export-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 4px solid #ffffff;
+    position: relative;
+    z-index: 1;
+}
+
+.vodafone-logo {
+    width: 120px;
+    height: 48px;
+    margin-right: 30px;
+}
+
+.export-header h2 {
+    color: #ffffff;
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.export-agenda-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: calc(100% - 180px);
+    overflow: visible;
+    position: relative;
+    z-index: 1;
+    padding-bottom: 20px;
+}
+
+.export-agenda-list .agenda-item {
+    padding: 25px 30px;
+    border-radius: 30px;
+    font-size: 1.4rem;
+    box-shadow: none;
+}
+
+.export-agenda-list .item-title {
+    font-size: 1.6rem;
+}
+
+.export-agenda-list .item-status {
+    font-size: 1.1rem;
+    padding: 8px 16px;
+}
+
+.export-agenda-list .item-minutes {
+    font-size: 1.4rem;
+    padding: 10px 20px;
+    min-width: 100px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .controls {
+        flex-direction: column;
+    }
+    
+    .input-group {
+        min-width: 100%;
+    }
+    
+    header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .item-content {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .item-status,
+    .item-minutes {
+        align-self: flex-end;
+    }
+}
+
+/* Dynamic scaling for export */
+.export-container.scale-down .export-agenda-list .agenda-item {
+    padding: 15px 20px;
+    font-size: 1.1rem;
+}
+
+.export-container.scale-down .export-agenda-list .item-title {
+    font-size: 1.3rem;
+}
+
+.export-container.scale-down .export-agenda-list .item-status {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+}
+
+.export-container.scale-down .export-agenda-list .item-minutes {
+    font-size: 1.1rem;
+    padding: 8px 16px;
+}
+
+.export-container.scale-down-more .export-agenda-list .agenda-item {
+    padding: 10px 15px;
+    font-size: 0.9rem;
+}
+
+.export-container.scale-down-more .export-agenda-list .item-title {
+    font-size: 1.1rem;
+}
+
+.export-container.scale-down-more .export-agenda-list .item-status {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+}
+
+.export-container.scale-down-more .export-agenda-list .item-minutes {
+    font-size: 0.9rem;
+    padding: 6px 12px;
+}

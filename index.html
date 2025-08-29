@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vodafone Agenda Builder</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Agenda Builder</h1>
+            <div class="header-controls">
+                <button id="saveBtn" class="control-btn">Save to PC</button>
+                <button id="loadBtn" class="control-btn">Load from PC</button>
+                <input type="file" id="fileInput" accept=".json" style="display: none;">
+                <button id="exportBtn" class="export-btn">Export as PNG</button>
+            </div>
+        </header>
+
+        <div class="project-tabs">
+            <div class="tabs-container">
+                <div class="tab active" data-project="Project 1">Project 1</div>
+                <button class="add-tab-btn" id="addTabBtn">+</button>
+            </div>
+            <div class="tab-controls">
+                <button id="renameTabBtn" class="tab-control-btn">Rename</button>
+                <button id="deleteTabBtn" class="tab-control-btn">Delete</button>
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="input-group">
+                <input type="text" id="titleInput" placeholder="Agenda item title" maxlength="100">
+            </div>
+            <div class="input-group">
+                <select id="statusSelect">
+                    <option value="">Select status</option>
+                    <option value="alignment">Alignment</option>
+                    <option value="approval">Approval</option>
+                    <option value="help">Help Required</option>
+                    <option value="decision">Decision</option>
+                    <option value="informed">Informed</option>
+                    <option value="review">Review</option>
+                    <option value="escalation">Escalation</option>
+                </select>
+            </div>
+            <div class="input-group">
+                <input type="number" id="minutesInput" placeholder="Minutes" min="1" max="999">
+            </div>
+            <button id="addBtn" class="add-btn">Add Item</button>
+        </div>
+
+        <div id="agendaList" class="agenda-list"></div>
+    </div>
+
+    <!-- Export container (hidden) -->
+    <div id="exportContainer" class="export-container">
+        <div class="export-header">
+            <svg class="vodafone-logo" viewBox="0 0 100 40" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="20" cy="20" r="18" fill="#E60000"/>
+                <circle cx="20" cy="20" r="12" fill="white"/>
+            </svg>
+            <h2>Meeting Agenda</h2>
+        </div>
+        <div id="exportAgendaList" class="export-agenda-list"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
