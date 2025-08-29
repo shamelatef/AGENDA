@@ -239,7 +239,7 @@ h1 {
 }
 
 .agenda-item.approval {
-    background-color: #1976D2;
+    background-color: #052545;
     color: white;
 }
 
@@ -330,6 +330,18 @@ h1 {
 .editable:hover {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 6px;
+}
+
+/* Hide number input spinners */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+input[type="number"] {
+    -moz-appearance: textfield;
+    appearance: textfield;
 }
 
 /* Drag and Drop styles */

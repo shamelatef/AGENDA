@@ -4,7 +4,7 @@ class AgendaApp {
         this.currentProject = 'Project 1';
         this.statusConfig = {
             alignment: { label: 'Alignment', color: '#6A1B9A' },
-            approval: { label: 'Approval', color: '#1976D2' },
+            approval: { label: 'Approval', color: '#052545' },
             help: { label: 'Help Required', color: '#FFFFC5' },
             decision: { label: 'Decision', color: '#64B5F6' },
             informed: { label: 'Informed', color: '#388E3C' },
@@ -122,19 +122,19 @@ class AgendaApp {
         
         itemDiv.innerHTML = `
             <div class="item-content">
-                <div class="item-title ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editTitle(${item.id}, this)"` : ''}>${this.escapeHtml(item.title)}</div>
-                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editStatus(${item.id}, this)"` : ''}>
+                <div class="item-title ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editTitle(${item.id}, this)"` : ''}>${this.escapeHtml(item.title)}</div>
+                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editStatus(${item.id}, this)"` : ''}>
                     ${statusIcon}
                     ${statusLabel}
                 </div>
-                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editMinutes(${item.id}, this)"` : ''}>
+                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editMinutes(${item.id}, this)"` : ''}>
                     <svg class="clock-icon" viewBox="0 0 24 24">
                         <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
                     </svg>
                     ${item.minutes} min
                 </div>
             </div>
-            ${!isExport ? `<button class="delete-btn" onclick="agendaApp.deleteAgendaItem(${item.id})">×</button>` : ''}
+            ${!isExport ? `<button class="delete-btn" onclick="event.stopPropagation(); agendaApp.deleteAgendaItem(${item.id})">×</button>` : ''}
         `;
         
         return itemDiv;
@@ -402,9 +402,10 @@ class AgendaApp {
             font-weight: inherit;
             padding: 4px 8px;
             border-radius: 8px;
-            width: 80px;
+            width: 60px;
             outline: none;
-            text-align: center;
+            -webkit-appearance: textfield;
+            -moz-appearance: textfield;
         `;
 
         const clockIcon = element.querySelector('.clock-icon');
@@ -414,7 +415,12 @@ class AgendaApp {
         input.focus();
         input.select();
 
+        let isEditingActive = true;
+
         const saveEdit = () => {
+            if (!isEditingActive) return;
+            isEditingActive = false;
+            
             const newMinutes = parseInt(input.value);
             if (newMinutes && newMinutes > 0) {
                 item.minutes = newMinutes;
@@ -424,6 +430,7 @@ class AgendaApp {
         };
 
         input.addEventListener('blur', saveEdit);
+        
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 input.blur();
@@ -696,7 +703,7 @@ class AgendaApp {
         document.addEventListener('pointermove', this.handlePointerMove.bind(this));
         document.addEventListener('pointerup', this.handlePointerUp.bind(this));
         
-        e.preventDefault();
+        // Don't prevent default to allow click events on editable elements
     }
 
     handlePointerMove(e) {
@@ -713,6 +720,9 @@ class AgendaApp {
             
             // Create ghost element
             this.createGhostElement(e);
+            
+            // Prevent default once dragging starts
+            e.preventDefault();
         }
         
         if (this.isDragging) {
@@ -724,9 +734,9 @@ class AgendaApp {
             
             // Handle drop zone detection
             this.updateDropZone(e);
+            
+            e.preventDefault();
         }
-        
-        e.preventDefault();
     }
 
     handlePointerUp(e) {
@@ -742,13 +752,13 @@ class AgendaApp {
             
             // Clean up
             this.cleanupDrag();
+            
+            e.preventDefault();
         }
         
         this.draggedElement = null;
         this.draggedItemId = null;
         this.isDragging = false;
-        
-        e.preventDefault();
     }
 
     createGhostElement(e) {
