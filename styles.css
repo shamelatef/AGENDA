@@ -436,7 +436,7 @@ input[type="number"] {
     left: -9999px;
     top: -9999px;
     width: 1920px;
-    height: 1080px;
+    min-height: 1080px;
     background: linear-gradient(135deg, #000000 0%, #1a0000 30%, #330000 70%, #E60000 100%);
     padding: 60px 60px 100px 60px;
     box-sizing: border-box;
@@ -495,7 +495,7 @@ input[type="number"] {
     display: flex;
     flex-direction: column;
     gap: 20px;
-    height: calc(100% - 180px);
+    min-height: calc(100% - 180px);
     overflow: visible;
     position: relative;
     z-index: 1;
