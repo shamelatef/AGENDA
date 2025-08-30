@@ -227,12 +227,14 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
     position: relative;
+    border: 9px solid;
+    border-radius: 40px;
 }
 
 .agenda-item:hover {
     transform: translateY(-2px);
 }
-
+/*
 .agenda-item.alignment {
     background-color: #6A1B9A;
     color: white;
@@ -267,6 +269,14 @@ h1 {
     background-color: #FFA500;
     color: #333;
 }
+*/
+.agenda-item.alignment { border-color: #6A1B9A; }
+.agenda-item.approval { border-color: #093c6f; }
+.agenda-item.help { border-color: #e7dc9f; }
+.agenda-item.decision { border-color: #64B5F6; }
+.agenda-item.informed { border-color: #388E3C; }
+.agenda-item.review { border-color: #D32F2F; }
+.agenda-item.escalation { border-color: #FFA500; }
 
 .item-content {
     flex: 1;
@@ -279,6 +289,7 @@ h1 {
     font-size: 1.2rem;
     font-weight: bold;
     flex: 1;
+    color:white;
 }
 
 .item-status {
@@ -287,12 +298,27 @@ h1 {
     text-transform: uppercase;
     letter-spacing: 1px;
     padding: 6px 12px;
-    background-color: rgba(255, 255, 255, 0.2);
     border-radius: 20px;
     display: flex;
     align-items: center;
     gap: 6px;
+    color: white;
 }
+
+.alignment .item-status { background: #6A1B9A; }
+.approval .item-status { background: #063a6e; }
+.help .item-status { 
+    background: #e7dc9f;
+    color: #333;
+}
+.decision .item-status { background: #64B5F6; }
+.informed .item-status { background: #388E3C; }
+.review .item-status { background: #D32F2F; }
+.escalation .item-status { 
+    background: #FFA500;
+    color: #333;
+}
+
 
 .item-minutes {
     font-size: 1.1rem;
@@ -300,7 +326,8 @@ h1 {
     min-width: 80px;
     text-align: center;
     padding: 8px 16px;
-    background-color: rgba(255, 255, 255, 0.2);
+    background-color: rgba(197, 191, 173, 0.2);
+    color: white;
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -501,9 +528,12 @@ h1 {
     width: 1920px;
     height: 1080px;
     background: linear-gradient(135deg, #000000 0%, #1a0000 30%, #330000 70%, #E60000 100%);
-    padding: 60px 60px 100px 60px;
+    padding: 40px 60px;
     box-sizing: border-box;
     position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 .export-container::before {
@@ -557,19 +587,40 @@ h1 {
 .export-agenda-list {
     display: flex;
     flex-direction: column;
-    gap: 20px;
-    height: calc(100% - 180px);
-    overflow: visible;
-    position: relative;
-    z-index: 1;
-    padding-bottom: 20px;
+    gap: 10px;
+    flex: 1;
+    padding: 10px 5px 10px 0;
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Custom scrollbar for WebKit browsers */
+.export-agenda-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.export-agenda-list::-webkit-scrollbar-track {
+    background: #2d0a0a;
+    border-radius: 4px;
+}
+
+.export-agenda-list::-webkit-scrollbar-thumb {
+    background-color: #E60000;
+    border-radius: 4px;
 }
 
 .export-agenda-list .agenda-item {
-    padding: 25px 30px;
-    border-radius: 30px;
-    font-size: 1.4rem;
+    padding: 15px 25px;
+    border-radius: 25px;
+    font-size: 1.2rem;
     box-shadow: none;
+    display: flex;
+    align-items: center;
+    min-height: 80px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+    transition: all 0.2s ease;
 }
 
 .export-agenda-list .item-title {
