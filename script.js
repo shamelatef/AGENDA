@@ -116,15 +116,15 @@ class AgendaApp {
         itemDiv.innerHTML = `
             <div class="item-content">
                 <div class="item-title ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editTitle(${item.id}, this)"` : ''}>${this.escapeHtml(item.title)}</div>
-                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editStatus(${item.id}, this)"` : ''}>
+                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.showStatusPopup(${item.id})"` : ''}>
                     ${statusIcon}
                     ${statusLabel}
                 </div>
-                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editMinutes(${item.id}, this)"` : ''}>
+                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.showTimePopup(${item.id})"` : ''}>
                     <svg class="clock-icon" viewBox="0 0 24 24">
                         <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
                     </svg>
-                    ${item.minutes} min
+                    <span class="minutes-value">${item.minutes}</span> min
                 </div>
             </div>
             ${!isExport ? `<button class="delete-btn" onclick="agendaApp.deleteAgendaItem(${item.id})">×</button>` : ''}
@@ -326,104 +326,130 @@ class AgendaApp {
             this.saveToLocalStorage();
         };
 
+        const cancelEdit = () => {
+            element.textContent = currentText;
+            element.classList.add('editable');
+        };
+
         input.addEventListener('blur', saveEdit);
-        input.addEventListener('keypress', (e) => {
+        input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 input.blur();
+            } else if (e.key === 'Escape') {
+                cancelEdit();
             }
         });
     }
 
-    editStatus(itemId, element) {
+    showStatusPopup(itemId) {
         const currentItems = this.getCurrentProjectItems();
         const item = currentItems.find(item => item.id === itemId);
         if (!item) return;
-
-        const select = document.createElement('select');
-        select.className = 'inline-edit-select';
-        select.style.cssText = `
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: inherit;
-            font-size: inherit;
-            font-weight: inherit;
-            padding: 4px 8px;
-            border-radius: 8px;
-            outline: none;
-        `;
-
-        Object.keys(this.statusConfig).forEach(statusKey => {
-            const option = document.createElement('option');
-            option.value = statusKey;
-            option.textContent = this.statusConfig[statusKey].label;
-            option.selected = statusKey === item.status;
-            option.style.cssText = 'background: #2d0a0a; color: #fff;';
-            select.appendChild(option);
+        
+        const popup = document.getElementById('statusPopup');
+        const optionsContainer = popup.querySelector('.status-options');
+        optionsContainer.innerHTML = '';
+        
+        // Create status options with icons and colors
+        Object.entries(this.statusConfig).forEach(([key, status]) => {
+            const option = document.createElement('div');
+            option.className = 'status-option';
+            option.style.borderLeft = `4px solid ${status.color}`;
+            option.innerHTML = `
+                <span class="status-icon">${this.getStatusIcon(key)}</span>
+                <span class="status-label">${status.label}</span>
+            `;
+            option.dataset.status = key;
+            
+            // Highlight currently selected status
+            if (key === item.status) {
+                option.style.background = `${status.color}20`; // 20% opacity of status color
+                option.style.borderColor = status.color;
+            }
+            
+            option.addEventListener('click', () => this.handleStatusSelect(item, key));
+            optionsContainer.appendChild(option);
         });
-
-        element.innerHTML = '';
-        element.appendChild(select);
-        select.focus();
-
-        const saveEdit = () => {
-            const newStatus = select.value;
-            item.status = newStatus;
-            this.saveToLocalStorage();
-            this.renderAgendaItems();
+        
+        // Show popup
+        popup.classList.add('active');
+        
+        // Close on cancel button click
+        popup.querySelector('.popup-button.cancel').onclick = () => {
+            popup.classList.remove('active');
         };
-
-        select.addEventListener('blur', saveEdit);
-        select.addEventListener('change', saveEdit);
+        
+        // Close on Escape key
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                popup.classList.remove('active');
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        };
+        
+        document.addEventListener('keydown', handleKeyDown);
     }
 
-    editMinutes(itemId, element) {
+    showTimePopup(itemId) {
         const currentItems = this.getCurrentProjectItems();
         const item = currentItems.find(item => item.id === itemId);
         if (!item) return;
-
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.value = item.minutes;
-        input.min = '1';
-        input.max = '999';
-        input.className = 'inline-edit-input';
-        input.style.cssText = `
-            background: rgba(255, 255, 255, 0.2);
-            border: 2px solid rgba(255, 255, 255, 0.5);
-            color: inherit;
-            font-size: inherit;
-            font-weight: inherit;
-            padding: 4px 8px;
-            border-radius: 8px;
-            width: 80px;
-            outline: none;
-            text-align: center;
-        `;
-
-        const clockIcon = element.querySelector('.clock-icon');
-        element.innerHTML = '';
-        element.appendChild(clockIcon.cloneNode(true));
-        element.appendChild(input);
-        input.focus();
-        input.select();
-
-        const saveEdit = () => {
-            const newMinutes = parseInt(input.value);
-            if (newMinutes && newMinutes > 0) {
+        
+        const popup = document.getElementById('timePopup');
+        const timeInput = popup.querySelector('#timeInput');
+        timeInput.value = item.minutes;
+        
+        // Show popup
+        popup.classList.add('active');
+        timeInput.focus();
+        timeInput.select();
+        
+        const saveTime = () => {
+            const newMinutes = parseInt(timeInput.value);
+            if (newMinutes && newMinutes > 0 && newMinutes <= 999) {
                 item.minutes = newMinutes;
+                this.saveToLocalStorage();
+                this.renderAgendaItems();
+                popup.classList.remove('active');
+            } else {
+                this.showError('Please enter a valid number between 1 and 999');
+                timeInput.focus();
             }
-            this.saveToLocalStorage();
-            this.renderAgendaItems();
         };
-
-        input.addEventListener('blur', saveEdit);
-        input.addEventListener('keypress', (e) => {
+        
+        // Save on button click
+        popup.querySelector('.popup-button.save').onclick = saveTime;
+        
+        // Save on Enter key
+        timeInput.onkeydown = (e) => {
             if (e.key === 'Enter') {
-                input.blur();
+                saveTime();
             }
-        });
+        };
+        
+        // Close on cancel button click
+        popup.querySelector('.popup-button.cancel').onclick = () => {
+            popup.classList.remove('active');
+        };
+        
+        // Close on Escape key
+        const handleKeyDown = (e) => {
+            if (e.key === 'Escape') {
+                popup.classList.remove('active');
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        };
+        
+        document.addEventListener('keydown', handleKeyDown);
     }
 
+    handleStatusSelect(item, status) {
+        item.status = status;
+        this.saveToLocalStorage();
+        this.renderAgendaItems();
+        document.getElementById('statusPopup').classList.remove('active');
+    }
+    
     // Project Management Methods
     getCurrentProjectItems() {
         if (!this.projects[this.currentProject]) {
@@ -658,7 +684,7 @@ class AgendaApp {
         };
 
         input.addEventListener('blur', saveEdit);
-        input.addEventListener('keypress', (e) => {
+        input.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 input.blur();
             } else if (e.key === 'Escape') {

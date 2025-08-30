@@ -321,6 +321,149 @@ h1 {
     height: 20px;
 }
 
+/* Popup Styles */
+.popup-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.popup-overlay.active {
+    display: flex;
+}
+
+.popup-content {
+    background: #2d0a0a;
+    padding: 25px;
+    border-radius: 10px;
+    width: 90%;
+    max-width: 400px;
+    border: 2px solid #E60000;
+    color: white;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+    animation: popupFadeIn 0.2s ease-out;
+}
+
+@keyframes popupFadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.popup-content h3 {
+    margin-top: 0;
+    color: #E60000;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.status-options {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.status-option {
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    transition: all 0.2s ease;
+    margin-bottom: 6px;
+    position: relative;
+    overflow: hidden;
+}
+
+.status-option:last-child {
+    margin-bottom: 0;
+}
+
+.status-option:hover {
+    transform: translateX(8px);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.status-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.status-label {
+    font-weight: 500;
+    color: #fff;
+}
+
+/* Status specific hover effects */
+.status-option[data-status="alignment"]:hover { background-color: rgba(106, 27, 154, 0.2) !important; }
+.status-option[data-status="approval"]:hover { background-color: rgba(25, 118, 210, 0.2) !important; }
+.status-option[data-status="help"]:hover { background-color: rgba(255, 255, 197, 0.2) !important; }
+.status-option[data-status="decision"]:hover { background-color: rgba(100, 181, 246, 0.2) !important; }
+.status-option[data-status="informed"]:hover { background-color: rgba(56, 142, 60, 0.2) !important; }
+.status-option[data-status="review"]:hover { background-color: rgba(211, 47, 47, 0.2) !important; }
+.status-option[data-status="escalation"]:hover { background-color: rgba(255, 165, 0, 0.2) !important; }
+
+.popup-input {
+    width: 100%;
+    padding: 12px 15px;
+    margin: 15px 0;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    color: white;
+    font-size: 16px;
+}
+
+.popup-input:focus {
+    outline: none;
+    border-color: #E60000;
+    box-shadow: 0 0 0 2px rgba(230, 0, 0, 0.2);
+}
+
+.popup-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.popup-button {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.2s;
+    background: #444;
+    color: white;
+}
+
+.popup-button.save {
+    background: #E60000;
+}
+
+.popup-button:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.popup-button:active {
+    transform: translateY(0);
+}
+
 /* Inline editing styles */
 .editable {
     cursor: pointer;

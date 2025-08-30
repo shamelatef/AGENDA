@@ -67,6 +67,31 @@
         <div id="exportAgendaList" class="export-agenda-list"></div>
     </div>
 
+    <!-- Status Popup -->
+    <div id="statusPopup" class="popup-overlay">
+        <div class="popup-content">
+            <h3>Select Status</h3>
+            <div class="status-options">
+                <!-- Will be populated by JavaScript -->
+            </div>
+            <div class="popup-buttons">
+                <button class="popup-button cancel">Cancel (Esc)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Time Popup -->
+    <div id="timePopup" class="popup-overlay">
+        <div class="popup-content">
+            <h3>Edit Time (minutes)</h3>
+            <input type="number" id="timeInput" min="1" max="999" class="popup-input" placeholder="Enter minutes">
+            <div class="popup-buttons">
+                <button class="popup-button cancel">Cancel (Esc)</button>
+                <button class="popup-button save">Save (Enter)</button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
