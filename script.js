@@ -4,7 +4,7 @@ class AgendaApp {
         this.currentProject = 'Project 1';
         this.statusConfig = {
             alignment: { label: 'Alignment', color: '#6A1B9A' },
-            approval: { label: 'Approval', color: '#052545' },
+            approval: { label: 'Approval', color: '#1976D2' },
             help: { label: 'Help Required', color: '#FFFFC5' },
             decision: { label: 'Decision', color: '#64B5F6' },
             informed: { label: 'Informed', color: '#388E3C' },
@@ -109,32 +109,25 @@ class AgendaApp {
     createAgendaItemElement(item, isExport = false) {
         const itemDiv = document.createElement('div');
         itemDiv.className = `agenda-item ${item.status}`;
-        itemDiv.dataset.itemId = item.id;
-        
-        // Add pointer events for drag and drop (non-export items)
-        if (!isExport) {
-            itemDiv.addEventListener('pointerdown', (e) => this.handlePointerDown(e));
-            itemDiv.style.touchAction = 'none'; // Prevent default touch behaviors
-        }
         
         const statusLabel = this.statusConfig[item.status].label;
         const statusIcon = this.getStatusIcon(item.status);
         
         itemDiv.innerHTML = `
             <div class="item-content">
-                <div class="item-title ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editTitle(${item.id}, this)"` : ''}>${this.escapeHtml(item.title)}</div>
-                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editStatus(${item.id}, this)"` : ''}>
+                <div class="item-title ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editTitle(${item.id}, this)"` : ''}>${this.escapeHtml(item.title)}</div>
+                <div class="item-status ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editStatus(${item.id}, this)"` : ''}>
                     ${statusIcon}
                     ${statusLabel}
                 </div>
-                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="event.stopPropagation(); agendaApp.editMinutes(${item.id}, this)"` : ''}>
+                <div class="item-minutes ${!isExport ? 'editable' : ''}" ${!isExport ? `onclick="agendaApp.editMinutes(${item.id}, this)"` : ''}>
                     <svg class="clock-icon" viewBox="0 0 24 24">
                         <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,4A8,8 0 0,1 20,12A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4M12.5,7V12.25L17,14.92L16.25,16.15L11,13V7H12.5Z"/>
                     </svg>
                     ${item.minutes} min
                 </div>
             </div>
-            ${!isExport ? `<button class="delete-btn" onclick="event.stopPropagation(); agendaApp.deleteAgendaItem(${item.id})">×</button>` : ''}
+            ${!isExport ? `<button class="delete-btn" onclick="agendaApp.deleteAgendaItem(${item.id})">×</button>` : ''}
         `;
         
         return itemDiv;
@@ -402,10 +395,9 @@ class AgendaApp {
             font-weight: inherit;
             padding: 4px 8px;
             border-radius: 8px;
-            width: 60px;
+            width: 80px;
             outline: none;
-            -webkit-appearance: textfield;
-            -moz-appearance: textfield;
+            text-align: center;
         `;
 
         const clockIcon = element.querySelector('.clock-icon');
@@ -415,12 +407,7 @@ class AgendaApp {
         input.focus();
         input.select();
 
-        let isEditingActive = true;
-
         const saveEdit = () => {
-            if (!isEditingActive) return;
-            isEditingActive = false;
-            
             const newMinutes = parseInt(input.value);
             if (newMinutes && newMinutes > 0) {
                 item.minutes = newMinutes;
@@ -430,7 +417,6 @@ class AgendaApp {
         };
 
         input.addEventListener('blur', saveEdit);
-        
         input.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 input.blur();
@@ -679,207 +665,6 @@ class AgendaApp {
                 cancelEdit();
             }
         });
-    }
-
-    // Pointer Events Drag and Drop Methods
-    handlePointerDown(e) {
-        // Only handle left mouse button or touch
-        if (e.button !== 0 && e.pointerType === 'mouse') return;
-        
-        // Don't start drag on editable elements or buttons
-        if (e.target.classList.contains('editable') || e.target.classList.contains('delete-btn')) return;
-        
-        this.draggedElement = e.currentTarget;
-        this.draggedItemId = parseInt(e.currentTarget.dataset.itemId);
-        this.isDragging = false;
-        this.startX = e.clientX;
-        this.startY = e.clientY;
-        this.dragThreshold = 5; // pixels to move before starting drag
-        
-        // Capture pointer for smooth tracking
-        e.currentTarget.setPointerCapture(e.pointerId);
-        
-        // Add global listeners
-        document.addEventListener('pointermove', this.handlePointerMove.bind(this));
-        document.addEventListener('pointerup', this.handlePointerUp.bind(this));
-        
-        // Don't prevent default to allow click events on editable elements
-    }
-
-    handlePointerMove(e) {
-        if (!this.draggedElement) return;
-        
-        const deltaX = e.clientX - this.startX;
-        const deltaY = e.clientY - this.startY;
-        const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
-        
-        // Start dragging if moved beyond threshold
-        if (!this.isDragging && distance > this.dragThreshold) {
-            this.isDragging = true;
-            this.draggedElement.classList.add('dragging');
-            
-            // Create ghost element
-            this.createGhostElement(e);
-            
-            // Prevent default once dragging starts
-            e.preventDefault();
-        }
-        
-        if (this.isDragging) {
-            // Update ghost position
-            if (this.ghostElement) {
-                this.ghostElement.style.left = e.clientX - this.ghostOffset.x + 'px';
-                this.ghostElement.style.top = e.clientY - this.ghostOffset.y + 'px';
-            }
-            
-            // Handle drop zone detection
-            this.updateDropZone(e);
-            
-            e.preventDefault();
-        }
-    }
-
-    handlePointerUp(e) {
-        if (!this.draggedElement) return;
-        
-        // Remove global listeners
-        document.removeEventListener('pointermove', this.handlePointerMove.bind(this));
-        document.removeEventListener('pointerup', this.handlePointerUp.bind(this));
-        
-        if (this.isDragging) {
-            // Perform drop if valid
-            this.performDrop(e);
-            
-            // Clean up
-            this.cleanupDrag();
-            
-            e.preventDefault();
-        }
-        
-        this.draggedElement = null;
-        this.draggedItemId = null;
-        this.isDragging = false;
-    }
-
-    createGhostElement(e) {
-        const rect = this.draggedElement.getBoundingClientRect();
-        this.ghostOffset = {
-            x: e.clientX - rect.left,
-            y: e.clientY - rect.top
-        };
-        
-        // Create ghost element
-        this.ghostElement = this.draggedElement.cloneNode(true);
-        this.ghostElement.classList.add('drag-ghost');
-        this.ghostElement.style.cssText = `
-            position: fixed;
-            left: ${rect.left}px;
-            top: ${rect.top}px;
-            width: ${rect.width}px;
-            height: ${rect.height}px;
-            pointer-events: none;
-            z-index: 10000;
-            opacity: 0.9;
-            transform: scale(1.05) rotate(2deg);
-            box-shadow: 0 12px 40px rgba(230, 0, 0, 0.4);
-            transition: none;
-        `;
-        
-        document.body.appendChild(this.ghostElement);
-    }
-
-    updateDropZone(e) {
-        // Remove existing indicators
-        document.querySelectorAll('.agenda-item').forEach(item => {
-            item.classList.remove('drag-over');
-        });
-        document.querySelectorAll('.drag-placeholder').forEach(p => p.remove());
-        
-        // Find target element under pointer
-        const elementsUnderPointer = document.elementsFromPoint(e.clientX, e.clientY);
-        const targetItem = elementsUnderPointer.find(el => 
-            el.classList.contains('agenda-item') && el !== this.draggedElement
-        );
-        
-        if (targetItem) {
-            const rect = targetItem.getBoundingClientRect();
-            const midpoint = rect.top + rect.height / 2;
-            
-            targetItem.classList.add('drag-over');
-            
-            // Create placeholder
-            const placeholder = document.createElement('div');
-            placeholder.className = 'drag-placeholder';
-            
-            if (e.clientY < midpoint) {
-                targetItem.parentNode.insertBefore(placeholder, targetItem);
-            } else {
-                targetItem.parentNode.insertBefore(placeholder, targetItem.nextSibling);
-            }
-        }
-    }
-
-    performDrop(e) {
-        const placeholder = document.querySelector('.drag-placeholder');
-        if (!placeholder || !this.draggedItemId) return;
-        
-        // Find target item
-        const elementsUnderPointer = document.elementsFromPoint(e.clientX, e.clientY);
-        const targetItem = elementsUnderPointer.find(el => 
-            el.classList.contains('agenda-item') && el !== this.draggedElement
-        );
-        
-        if (!targetItem) return;
-        
-        const targetItemId = parseInt(targetItem.dataset.itemId);
-        const currentItems = this.getCurrentProjectItems();
-        
-        // Find indices
-        const draggedIndex = currentItems.findIndex(item => item.id === this.draggedItemId);
-        const targetIndex = currentItems.findIndex(item => item.id === targetItemId);
-        
-        if (draggedIndex === -1 || targetIndex === -1) return;
-        
-        // Determine new position
-        const rect = targetItem.getBoundingClientRect();
-        const midpoint = rect.top + rect.height / 2;
-        let newIndex = targetIndex;
-        
-        if (e.clientY >= midpoint) {
-            newIndex = targetIndex + 1;
-        }
-        
-        // Adjust for moving within the same array
-        if (draggedIndex < newIndex) {
-            newIndex--;
-        }
-        
-        // Perform the reorder
-        const [draggedItem] = currentItems.splice(draggedIndex, 1);
-        currentItems.splice(newIndex, 0, draggedItem);
-        
-        // Save and re-render
-        this.saveToLocalStorage();
-        this.renderAgendaItems();
-    }
-
-    cleanupDrag() {
-        // Remove ghost element
-        if (this.ghostElement) {
-            this.ghostElement.remove();
-            this.ghostElement = null;
-        }
-        
-        // Remove drag classes
-        if (this.draggedElement) {
-            this.draggedElement.classList.remove('dragging');
-        }
-        
-        // Remove all indicators
-        document.querySelectorAll('.agenda-item').forEach(item => {
-            item.classList.remove('drag-over');
-        });
-        document.querySelectorAll('.drag-placeholder').forEach(p => p.remove());
     }
 
     escapeHtml(text) {
