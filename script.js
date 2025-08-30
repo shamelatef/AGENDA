@@ -215,26 +215,74 @@ class AgendaApp {
         this.exportBtn.disabled = true;
 
         try {
+            // Store original styles
+            const originalStyles = {
+                position: this.exportContainer.style.position,
+                left: this.exportContainer.style.left,
+                top: this.exportContainer.style.top,
+                width: this.exportContainer.style.width,
+                height: this.exportContainer.style.height,
+                overflow: this.exportContainer.style.overflow,
+                visibility: this.exportContainer.style.visibility,
+                opacity: this.exportContainer.style.opacity,
+                zIndex: this.exportContainer.style.zIndex,
+                transform: this.exportContainer.style.transform
+            };
+
+            // Position export container for capture
+            Object.assign(this.exportContainer.style, {
+                position: 'fixed',
+                left: '0',
+                top: '0',
+                width: '1920px',
+                height: '1080px',
+                overflow: 'hidden',
+                visibility: 'visible',
+                opacity: '1',
+                zIndex: '9999',
+                transform: 'none'
+            });
+
             // Populate export container
             this.populateExportContainer();
             
-            // Apply scaling to fit items within slide
+            // Apply scaling to fit all items within 16:9
             this.applyExportScaling();
-            
-            // Position export container for capture
-            this.exportContainer.style.position = 'absolute';
-            this.exportContainer.style.left = '0';
-            this.exportContainer.style.top = '0';
-            this.exportContainer.style.visibility = 'visible';
-            this.exportContainer.style.opacity = '1';
-            this.exportContainer.style.width = '1920px';
-            this.exportContainer.style.height = '1080px';
-            this.exportContainer.style.overflow = 'hidden';
             
             // Wait for rendering
             await new Promise(resolve => requestAnimationFrame(resolve));
             
-            // Capture the export container with fixed 16:9 aspect ratio
+            // Calculate scale to fit all items
+            const contentHeight = this.exportAgendaList.scrollHeight;
+            const availableHeight = 900; // 1080 - header/footer
+            const itemCount = this.getCurrentProjectItems().length;
+            
+            // If we have 8 or more items, ensure the last item is fully visible
+            let scale = 1;
+            if (itemCount >= 8) {
+                const lastItem = this.exportAgendaList.lastElementChild;
+                if (lastItem) {
+                    const lastItemRect = lastItem.getBoundingClientRect();
+                    const containerRect = this.exportAgendaList.getBoundingClientRect();
+                    const lastItemBottom = lastItemRect.bottom - containerRect.top;
+                    
+                    // Calculate scale to fit the last item with some padding
+                    scale = Math.min(1, (availableHeight - 20) / lastItemBottom);
+                }
+            } else {
+                // For fewer than 8 items, use normal scaling
+                scale = Math.min(1, availableHeight / contentHeight);
+            }
+            
+            // Apply scale to fit all items
+            if (scale < 1) {
+                this.exportAgendaList.style.transform = `scale(${scale})`;
+                this.exportAgendaList.style.transformOrigin = 'top center';
+                this.exportAgendaList.style.width = '100%';
+                await new Promise(resolve => requestAnimationFrame(resolve));
+            }
+            
+            // Capture the export container with fixed 16:9 ratio
             const canvas = await html2canvas(this.exportContainer, {
                 width: 1920,
                 height: 1080,
@@ -249,16 +297,26 @@ class AgendaApp {
                 windowHeight: 1080,
                 onclone: (clonedDoc) => {
                     const cloneContainer = clonedDoc.getElementById('exportContainer');
-                    if (cloneContainer) {
+                    const cloneList = clonedDoc.getElementById('exportAgendaList');
+                    if (cloneContainer && cloneList) {
                         cloneContainer.style.position = 'absolute';
                         cloneContainer.style.left = '0';
                         cloneContainer.style.top = '0';
                         cloneContainer.style.width = '1920px';
                         cloneContainer.style.height = '1080px';
                         cloneContainer.style.overflow = 'hidden';
+                        
+                        if (scale < 1) {
+                            cloneList.style.transform = `scale(${scale})`;
+                            cloneList.style.transformOrigin = 'top center';
+                            cloneList.style.width = '100%';
+                        }
                     }
                 }
             });
+            
+            // Reset to original styles
+            Object.assign(this.exportContainer.style, originalStyles);
             
             // Reset container styles
             this.exportContainer.style.position = 'absolute';
@@ -291,68 +349,54 @@ class AgendaApp {
     populateExportContainer() {
         this.exportAgendaList.innerHTML = '';
         const currentItems = this.getCurrentProjectItems();
-        const maxItems = 9;
         
-        // Limit to maximum items
-        const itemsToShow = currentItems.slice(0, maxItems);
-        
-        itemsToShow.forEach(item => {
+        currentItems.forEach(item => {
             const itemElement = this.createAgendaItemElement(item, true);
             this.exportAgendaList.appendChild(itemElement);
         });
-        
-        // If we had to truncate, show a warning
-        if (currentItems.length > maxItems) {
-            const warning = document.createElement('div');
-            warning.textContent = `+${currentItems.length - maxItems} more items not shown`;
-            warning.style.color = '#ff6b6b';
-            warning.style.textAlign = 'center';
-            warning.style.padding = '10px';
-            warning.style.fontStyle = 'italic';
-            this.exportAgendaList.appendChild(warning);
-        }
     }
 
     applyExportScaling() {
         const itemCount = this.getCurrentProjectItems().length;
-        const maxItems = 9;
         
-        // Calculate available height for items (total height - header - padding)
-        const headerHeight = 150; // Approx height of header
-        const verticalPadding = 140; // Top + bottom padding
-        const availableHeight = 1080 - headerHeight - verticalPadding;
+        // Reset any previous transforms
+        this.exportAgendaList.style.transform = 'none';
+        this.exportAgendaList.style.transformOrigin = 'top center';
+        this.exportAgendaList.style.width = '100%';
         
-        if (itemCount > maxItems) {
-            // If more than 9 items, show a message and limit to 9
-            console.warn(`Maximum ${maxItems} items supported in export. Showing first ${maxItems} items.`);
-            // We'll handle the limiting in populateExportContainer
-        }
-        
-        // Calculate item height based on number of items (up to maxItems)
-        const displayCount = Math.min(itemCount, maxItems);
-        const itemHeight = Math.min(120, Math.floor(availableHeight / displayCount));
-        
-        // Set dynamic styles
-        const gap = Math.max(5, Math.min(15, Math.floor(availableHeight / displayCount / 10)));
-        const padding = Math.max(40, Math.min(60, Math.floor(availableHeight / 20)));
-        const fontSize = Math.max(0.8, Math.min(1.2, 1.2 - (0.05 * (displayCount - 5))));
-        
-        // Apply styles
-        this.exportAgendaList.style.gap = `${gap}px`;
-        this.exportContainer.style.padding = `${padding}px 60px ${padding}px 60px`;
-        this.exportAgendaList.style.fontSize = `${fontSize}em`;
-        
-        // Set item heights
-        const items = this.exportAgendaList.querySelectorAll('.agenda-item');
-        items.forEach(item => {
-            item.style.minHeight = `${itemHeight}px`;
-            item.style.display = 'flex';
-            item.style.alignItems = 'center';
+        // Set base styles for the export container
+        Object.assign(this.exportContainer.style, {
+            padding: '60px 80px',
+            overflow: 'hidden',
+            height: '1080px',
+            minHeight: '1080px',
+            maxHeight: '1080px'
         });
         
-        // Ensure no scrolling
-        this.exportAgendaList.style.overflowY = 'hidden';
-        this.exportAgendaList.style.maxHeight = 'none';
+        // Set base styles for the agenda list
+        Object.assign(this.exportAgendaList.style, {
+            gap: '12px',
+            fontSize: '1.1em',
+            padding: '0',
+            margin: '0',
+            width: '100%',
+            maxHeight: '960px', // 1080 - 120 (header/footer)
+            overflow: 'visible',
+            display: 'flex',
+            flexDirection: 'column'
+        });
+        
+        // Adjust item styles
+        const items = this.exportAgendaList.querySelectorAll('.agenda-item');
+        items.forEach(item => {
+            Object.assign(item.style, {
+                padding: '18px 24px',
+                margin: '0',
+                flexShrink: '0',
+                boxSizing: 'border-box',
+                width: '100%'
+            });
+        });
     }
 
     editTitle(itemId, element) {

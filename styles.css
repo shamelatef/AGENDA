@@ -526,14 +526,15 @@ h1 {
     left: -9999px;
     top: -9999px;
     width: 1920px;
-    height: 1080px;
+    min-height: 1080px;
     background: linear-gradient(135deg, #000000 0%, #1a0000 30%, #330000 70%, #E60000 100%);
     padding: 40px 60px;
     box-sizing: border-box;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
+    align-items: stretch;
 }
 
 .export-container::before {
@@ -587,12 +588,19 @@ h1 {
 .export-agenda-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 12px;
     flex: 1;
-    padding: 10px 5px 10px 0;
+    overflow-y: visible;
+    padding: 0;
     margin: 0;
-    width: 100%;
+    min-height: calc(100% - 100px);
     box-sizing: border-box;
+}
+
+.export-agenda-list .agenda-item {
+    flex-shrink: 0;
+    margin: 2px 0;
+    transition: all 0.2s ease;
 }
 
 /* Custom scrollbar for WebKit browsers */
@@ -611,16 +619,10 @@ h1 {
 }
 
 .export-agenda-list .agenda-item {
-    padding: 15px 25px;
-    border-radius: 25px;
-    font-size: 1.2rem;
+    padding: 25px 30px;
+    border-radius: 30px;
+    font-size: 1.4rem;
     box-shadow: none;
-    display: flex;
-    align-items: center;
-    min-height: 80px;
-    box-sizing: border-box;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
 }
 
 .export-agenda-list .item-title {
